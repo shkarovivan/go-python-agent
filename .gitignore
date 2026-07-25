@@ -1,0 +1,49 @@
+# ===== macOS =====
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ===== Архивы и экспортированные образы =====
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== Go =====
+*.exe
+*.exe~
+*.dll
+*.dylib
+*.test
+*.out
+go-server/server
+
+# ===== IDE / редакторы =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== Окружение и секреты =====
+.env
+.env.*
+!.env.example
+
+# ===== Логи =====
+*.log

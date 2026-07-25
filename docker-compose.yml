@@ -1,0 +1,18 @@
+services:
+  python-worker:
+    build:
+      context: ./python-worker
+    container_name: python-worker
+    expose:
+      - "5000"
+
+  go-server:
+    build:
+      context: ./go-server
+    container_name: go-server
+    ports:
+      - "80:8080"
+    environment:
+      PYTHON_SERVICE_URL: http://python-worker:5000/process
+    depends_on:
+      - python-worker
