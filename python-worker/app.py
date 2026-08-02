@@ -16,6 +16,10 @@ N_CTX = int(os.environ.get("N_CTX", "2048"))
 # Number of CPU threads for generation. 0 = auto (all physical cores) — usually
 # the optimum for inference, since token generation does not parallelize well.
 N_THREADS = int(os.environ.get("N_THREADS", "0"))
+# Enable Qwen3 thinking mode (<think>...</think>). Off by default: for short
+# tasks reasoning eats the whole token budget before the actual answer. Set
+# ENABLE_THINKING=true to enable it for complex prompts.
+ENABLE_THINKING = os.environ.get("ENABLE_THINKING", "false").lower() in ("1", "true", "yes")
 
 # The model is loaded once at application startup (module level) so it is not
 # re-initialized on every request. Gunicorn runs with --workers 1, so only a
@@ -59,12 +63,16 @@ def process():
     if llm is None:
         return jsonify({"error": "model is not loaded (MODEL_PATH is not set or invalid)"}), 503
 
+    # Qwen3 supports a "/no_think" suffix that disables the reasoning block,
+    # so the model answers directly (keeps short tasks within the token budget).
+    user_text = text if ENABLE_THINKING else f"{text} /no_think"
+
     try:
         # Use the chat endpoint so the instruct model applies its built-in
         # chat template (e.g. Qwen3 <|im_start|>...<|im_end|>) instead of raw
         # text completion, which otherwise loops/hallucinates.
         output = llm.create_chat_completion(
-            messages=[{"role": "user", "content": text}],
+            messages=[{"role": "user", "content": user_text}],
             max_tokens=MAX_TOKENS,
         )
     except Exception as exc:  # noqa: BLE001

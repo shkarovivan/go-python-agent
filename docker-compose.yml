@@ -13,6 +13,8 @@ services:
       N_CTX: "4096"
       # Number of CPU threads. "0" = auto (all physical cores).
       N_THREADS: "0"
+      # Disable Qwen3 thinking mode by default (set "true" to enable reasoning).
+      ENABLE_THINKING: "false"
     volumes:
       - ./models:/models:ro
 

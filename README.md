@@ -33,6 +33,7 @@ Internet ──:80──> [ go-server (:8080) ] ──HTTP──> [ python-worke
 | `python-worker` | `MAX_TOKENS`   | `256`                    | Лимит токенов в ответе модели                     |
 | `python-worker` | `N_CTX`        | `2048`                   | Размер контекста модели                           |
 | `python-worker` | `N_THREADS`    | `0`                      | Потоки CPU (`0` = авто, все физические ядра)      |
+| `python-worker` | `ENABLE_THINKING` | `false`              | Режим размышлений Qwen3 (`<think>`): `true` — включить |
 | `go-server`     | `PYTHON_SERVICE_URL` | `http://python-worker:5000/process` | Адрес Python-сервиса |
 
 ## Эндпоинты
