@@ -3,6 +3,8 @@ import os
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
+# Return non-ASCII (e.g. Cyrillic) as-is instead of \uXXXX escapes.
+app.json.ensure_ascii = False
 
 # Path to the local GGUF model is read from the environment variable.
 # If it is not set, the model is not loaded and /process returns 503.
@@ -57,12 +59,18 @@ def process():
         return jsonify({"error": "model is not loaded (MODEL_PATH is not set or invalid)"}), 503
 
     try:
-        output = llm(text, max_tokens=MAX_TOKENS, echo=False)
+        # Use the chat endpoint so the instruct model applies its built-in
+        # chat template (e.g. Qwen3 <|im_start|>...<|im_end|>) instead of raw
+        # text completion, which otherwise loops/hallucinates.
+        output = llm.create_chat_completion(
+            messages=[{"role": "user", "content": text}],
+            max_tokens=MAX_TOKENS,
+        )
     except Exception as exc:  # noqa: BLE001
         app.logger.error("Model inference failed: %s", exc)
         return jsonify({"error": "model inference failed"}), 500
 
-    result = output["choices"][0]["text"].strip()
+    result = output["choices"][0]["message"]["content"].strip()
     return jsonify({"result": result, "local": local}), 200
 
 
