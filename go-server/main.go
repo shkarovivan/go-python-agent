@@ -33,7 +33,7 @@ func main() {
 		Addr:         ":8080",
 		Handler:      loggingMiddleware(mux),
 		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 300 * time.Second,
+		WriteTimeout: 600 * time.Second,
 		IdleTimeout:  30 * time.Second,
 	}
 
@@ -77,10 +77,10 @@ func handleProcess(w http.ResponseWriter, r *http.Request, pythonServiceURL stri
 	}
 
 	// The timeout is intentionally large: local LLM generation on CPU can take
-	// tens of seconds. The value is below gunicorn's --timeout (300s) so the
-	// client gives up before the Python worker and returns a clear error.
+	// minutes for long outputs. The value is below gunicorn's --timeout (600s)
+	// so the client gives up before the Python worker and returns a clear error.
 	client := &http.Client{
-		Timeout: 280 * time.Second,
+		Timeout: 580 * time.Second,
 	}
 
 	pythonReq, err := http.NewRequest(http.MethodPost, pythonServiceURL, bytes.NewBuffer(payload))

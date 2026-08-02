@@ -17,5 +17,5 @@ COPY app.py ./
 EXPOSE 5000
 
 # --workers 1: the model is kept as a single in-memory instance.
-# --timeout 300: CPU generation can be slow.
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "300", "app:app"]
+# --timeout 600: CPU generation of long outputs can take minutes.
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "600", "app:app"]

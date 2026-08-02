@@ -9,7 +9,7 @@ services:
     environment:
       # Path to the GGUF model inside the container. The file lives in ./models/ on the host.
       MODEL_PATH: /models/model.gguf
-      MAX_TOKENS: "512"
+      MAX_TOKENS: "1024"
       N_CTX: "4096"
       # Number of CPU threads. "0" = auto (all physical cores).
       N_THREADS: "0"
