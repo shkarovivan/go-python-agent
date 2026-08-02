@@ -13,12 +13,11 @@ import (
 
 type ProcessRequest struct {
 	Text  string `json:"text"`
-	Local bool   `json:"local"`
+	Local *bool  `json:"local,omitempty"`
 }
 
 type ProcessResponse struct {
 	Result string `json:"result"`
-	Local  bool   `json:"local"`
 }
 
 func main() {

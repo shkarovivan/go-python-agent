@@ -51,9 +51,10 @@ def process():
     if not text:
         return jsonify({"error": "text is required"}), 400
 
-    # The local flag is present in the request schema but is NOT used yet:
-    # the service always calls the local GGUF model and returns its answer.
-    local = bool(data.get("local", False))
+    # The optional `local` flag defaults to True when omitted. It is accepted
+    # for forward compatibility but is NOT branched on yet: the service always
+    # calls the local GGUF model.
+    local = bool(data.get("local", True))
 
     if llm is None:
         return jsonify({"error": "model is not loaded (MODEL_PATH is not set or invalid)"}), 503
@@ -70,8 +71,14 @@ def process():
         app.logger.error("Model inference failed: %s", exc)
         return jsonify({"error": "model inference failed"}), 500
 
-    result = output["choices"][0]["message"]["content"].strip()
-    return jsonify({"result": result, "local": local}), 200
+    content = output["choices"][0]["message"]["content"]
+    # Qwen3 emits a <think>...</think> reasoning block before the final
+    # answer; drop everything up to and including </think>.
+    if "</think>" in content:
+        content = content.split("</think>", 1)[1]
+    result = content.strip()
+    app.logger.info("process: local=%s", local)
+    return jsonify({"result": result}), 200
 
 
 @app.route("/health", methods=["GET"])
